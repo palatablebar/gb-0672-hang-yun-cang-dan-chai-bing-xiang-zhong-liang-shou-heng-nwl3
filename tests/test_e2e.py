@@ -19,7 +19,7 @@ def test_bad_dataset(tmp_path,monkeypatch):
 def test_missing_run(tmp_path,monkeypatch):
     c=client(tmp_path,monkeypatch);assert c.get('/api/runs/none').status_code==404
 def test_restart_store(tmp_path,sample):
-    p=str(tmp_path/'durable.sqlite');store.save(p,sample);assert store.get(p,sample['manifest']['run_id'])['manifest']['sha256']==sample['manifest']['sha256']
+    p=str(tmp_path/'durable.sqlite');carrier=sample['manifest']['carrier'];store.save(p,sample);assert store.get(p,sample['manifest']['run_id'],carrier)['manifest']['sha256']==sample['manifest']['sha256']
 def test_bad_revision(tmp_path,monkeypatch):
     c=client(tmp_path,monkeypatch);s=c.post('/api/runs',json={}).json();assert c.post('/api/runs/'+s['manifest']['run_id']+'/review',json={'revision':0}).status_code==422
 

@@ -13,7 +13,7 @@ docker compose exec -T app pytest -q
 
 各模块页面对应 `/<模块英文名>`，各模块执行入口为 `POST /api/<模块英文名>`，不传参即可独立演示。完整运行 `POST /api/runs` 支持 `dataset`（dirty/clean/legacy）、`csv_text` 与 `overrides` 参数。批次历史 `GET /api/runs`，详情 `GET /api/runs/{run_id}`。
 
-同输入与规则版本生成相同批号，只保留一条批次。复核入口 `POST /api/runs/{run_id}/review` 提交当前 `revision`，陈旧提交409。归档包只有一个下载入口 `GET /api/export/{run_id}`，含证据和运行摘要。原始隔离在页面同屏显示。
+同输入与规则版本生成相同批号，只保留一条批次。**复用只在本承运人范围内生效**：批次指纹包含承运人编号（请求头 `X-Carrier-Id` 或查询参数 `carrier_id`，缺省演示承运人 `DEMO-CARRIER`），两家承运人提交相同舱单各自独立成批，互不可见批次、历史与导出，跨方访问按不存在返回404；同一承运人重试相同内容不新增第二条批次。每次接入响应 `accession` 写明裁决口径、复用了本承运人哪次处理（`reused_run_id`）及证据归属。复核入口 `POST /api/runs/{run_id}/review` 提交当前 `revision`，陈旧提交409。归档包只有一个下载入口 `GET /api/export/{run_id}`，含证据和运行摘要，包内标注承运人归属。原始隔离在页面同屏显示。裁决细则见 `docs/BATCH-ACCESSION-RULING.md`。
 
 SQLite使用命名卷，容器重启后保留历史。要重建演示可在Compose中改用新的卷名称，保留旧卷。
 
